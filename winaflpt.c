@@ -1314,7 +1314,7 @@ void start_process(char *cmd) {
 	if (mem_limit || cpu_aff) {
 		hJob = CreateJobObject(NULL, NULL);
 		if (hJob == NULL) {
-			FATAL("CreateJobObject failed, GLE=%d.\n", GetLastError());
+			FATAL("CreateJobObject failed, GLE=%lu.\n", GetLastError());
 		}
 
 		ZeroMemory(&job_limit, sizeof(job_limit));
@@ -1334,12 +1334,12 @@ void start_process(char *cmd) {
 			&job_limit,
 			sizeof(job_limit)
 		)) {
-			FATAL("SetInformationJobObject failed, GLE=%d.\n", GetLastError());
+			FATAL("SetInformationJobObject failed, GLE=%lu.\n", GetLastError());
 		}
 	}
 
 	if (!CreateProcessA(NULL, cmd, NULL, NULL, inherit_handles, DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS, NULL, NULL, &si, &pi)) {
-		FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+		FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
 	}
 
 	child_handle = pi.hProcess;
@@ -1348,7 +1348,7 @@ void start_process(char *cmd) {
 
 	if (mem_limit || cpu_aff) {
 		if (!AssignProcessToJobObject(hJob, child_handle)) {
-			FATAL("AssignProcessToJobObject failed, GLE=%d.\n", GetLastError());
+			FATAL("AssignProcessToJobObject failed, GLE=%lu.\n", GetLastError());
 		}
 	}
 

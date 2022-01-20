@@ -2437,7 +2437,7 @@ static void create_target_process(char** argv) {
     &sa);                     // allow access to everyone
 
   if (pipe_handle == INVALID_HANDLE_VALUE) {
-    FATAL("CreateNamedPipe failed, GLE=%d.\n", GetLastError());
+    FATAL("CreateNamedPipe failed, GLE=%lu.\n", GetLastError());
   }
 
   target_cmd = argv_to_cmd(argv);
@@ -2492,7 +2492,7 @@ static void create_target_process(char** argv) {
   if(mem_limit || cpu_aff) {
     hJob = CreateJobObject(NULL, NULL);
     if(hJob == NULL) {
-      FATAL("CreateJobObject failed, GLE=%d.\n", GetLastError());
+      FATAL("CreateJobObject failed, GLE=%lu.\n", GetLastError());
     }
 
     ZeroMemory(&job_limit, sizeof(job_limit));
@@ -2512,12 +2512,12 @@ static void create_target_process(char** argv) {
       &job_limit,
       sizeof(job_limit)
     )) {
-      FATAL("SetInformationJobObject failed, GLE=%d.\n", GetLastError());
+      FATAL("SetInformationJobObject failed, GLE=%lu.\n", GetLastError());
     }
   }
 
   if(!CreateProcess(NULL, cmd, NULL, NULL, inherit_handles, CREATE_SUSPENDED, NULL, NULL, &si, &pi)) {
-    FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+    FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
   }
 
   child_handle = pi.hProcess;
@@ -2525,7 +2525,7 @@ static void create_target_process(char** argv) {
 
   if(mem_limit || cpu_aff) {
     if(!AssignProcessToJobObject(hJob, child_handle)) {
-      FATAL("AssignProcessToJobObject failed, GLE=%d.\n", GetLastError());
+      FATAL("AssignProcessToJobObject failed, GLE=%lu.\n", GetLastError());
     }
     CloseHandle(hJob);
   }
@@ -2536,7 +2536,7 @@ static void create_target_process(char** argv) {
   watchdog_enabled = 1;
 
   if(!OverlappedConnectNamedPipe(pipe_handle, &pipe_overlapped)) {
-      FATAL("ConnectNamedPipe failed, GLE=%d.\n", GetLastError());
+      FATAL("ConnectNamedPipe failed, GLE=%lu.\n", GetLastError());
   }
 
   watchdog_enabled = 0;
@@ -2548,7 +2548,7 @@ static void create_target_process(char** argv) {
     child_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, child_pid);
     if (child_handle == NULL)
     {
-      FATAL("OpenProcess failed, GLE=%d.\n", GetLastError());
+      FATAL("OpenProcess failed, GLE=%lu.\n", GetLastError());
     }
 
     CloseHandle(child_thread_handle);
@@ -2619,7 +2619,7 @@ static void destroy_target_process(int wait_exit) {
 		ZeroMemory(&pi, sizeof(pi));
 
 		if (!CreateProcess(NULL, kill_cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-			FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+			FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
 		}
 
 		CloseHandle(pi.hProcess);
@@ -2639,7 +2639,7 @@ static void destroy_target_process(int wait_exit) {
 		kill_cmd = alloc_printf("taskkill /PID %d /F", child_pid);
 
 		if (!CreateProcess(NULL, kill_cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-			FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+			FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
 		}
 
 		CloseHandle(pi.hProcess);

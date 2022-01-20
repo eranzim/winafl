@@ -289,7 +289,7 @@ static void read_initial_file(void) {
     FATAL("Zero-sized input file.");
 
   if (st.st_size >= TMIN_MAX_FILE)
-    FATAL("Input file is too large (%u MB max)", TMIN_MAX_FILE / 1024 / 1024);
+    FATAL("Input file is too large (%lu MB max)", TMIN_MAX_FILE / 1024 / 1024);
 
   in_len  = st.st_size;
   in_data = ck_alloc_nozero(in_len);
@@ -356,7 +356,7 @@ size_t ArgvQuote(char *in, char *out) {
 
   while(*p) {
     size_t num_backslashes = 0;
-    while((*p) && (*p == '\\')) {
+    while(*p == '\\') {
       p++;
       num_backslashes++;
     }
@@ -447,7 +447,7 @@ static void create_target_process(char** argv) {
     NULL);                    // default security attribute
 
   if (pipe_handle == INVALID_HANDLE_VALUE) {
-    FATAL("CreateNamedPipe failed, GLE=%d.\n", GetLastError());
+    FATAL("CreateNamedPipe failed, GLE=%lu.\n", GetLastError());
   }
 
   target_cmd = argv_to_cmd(argv);
@@ -484,7 +484,7 @@ static void create_target_process(char** argv) {
   if (mem_limit != 0) {
     hJob = CreateJobObject(NULL, NULL);
     if (hJob == NULL) {
-      FATAL("CreateJobObject failed, GLE=%d.\n", GetLastError());
+      FATAL("CreateJobObject failed, GLE=%lu.\n", GetLastError());
     }
 
     ZeroMemory(&job_limit, sizeof(job_limit));
@@ -497,12 +497,12 @@ static void create_target_process(char** argv) {
       &job_limit,
       sizeof(job_limit)
     )) {
-      FATAL("SetInformationJobObject failed, GLE=%d.\n", GetLastError());
+      FATAL("SetInformationJobObject failed, GLE=%lu.\n", GetLastError());
     }
   }
 
   if (!CreateProcess(NULL, cmd, NULL, NULL, inherit_handles, CREATE_SUSPENDED, NULL, NULL, &si, &pi)) {
-    FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+    FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
   }
 
   child_handle = pi.hProcess;
@@ -510,7 +510,7 @@ static void create_target_process(char** argv) {
 
   if (mem_limit != 0) {
     if (!AssignProcessToJobObject(hJob, child_handle)) {
-      FATAL("AssignProcessToJobObject failed, GLE=%d.\n", GetLastError());
+      FATAL("AssignProcessToJobObject failed, GLE=%lu.\n", GetLastError());
     }
   }
 
@@ -521,7 +521,7 @@ static void create_target_process(char** argv) {
 
   if (!ConnectNamedPipe(pipe_handle, NULL)) {
     if (GetLastError() != ERROR_PIPE_CONNECTED) {
-      FATAL("ConnectNamedPipe failed, GLE=%d.\n", GetLastError());
+      FATAL("ConnectNamedPipe failed, GLE=%lu.\n", GetLastError());
     }
   }
 
@@ -585,7 +585,7 @@ static void destroy_target_process(int wait_exit) {
     ZeroMemory( &pi, sizeof(pi) );
 
     if(!CreateProcess(NULL, kill_cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-      FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+      FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
     }
 
     CloseHandle(pi.hProcess);
@@ -605,7 +605,7 @@ static void destroy_target_process(int wait_exit) {
     kill_cmd = alloc_printf("taskkill /PID %d /F", child_pid);
 
     if(!CreateProcess(NULL, kill_cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-      FATAL("CreateProcess failed, GLE=%d.\n", GetLastError());
+      FATAL("CreateProcess failed, GLE=%lu.\n", GetLastError());
     }
 
     CloseHandle(pi.hProcess);
@@ -1135,8 +1135,8 @@ static void usage(u8* argv0) {
        "Execution control settings:\n\n"
 
        "  -f file       - input file read by the tested program (stdin)\n"
-       "  -t msec       - timeout for each run (%u ms)\n"
-       "  -m megs       - memory limit for child process (%u MB)\n"
+       "  -t msec       - timeout for each run (%d ms)\n"
+       "  -m megs       - memory limit for child process (%d MB)\n"
 
        "Analysis settings:\n\n"
 

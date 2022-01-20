@@ -222,7 +222,7 @@
 
 #define FATAL(...) do { \
     SAYF(bSTOP RESET_G1 CURSOR_SHOW cLRD "\n[-] PROGRAM ABORT : " cBRI __VA_ARGS__); \
-    SAYF(cLRD "\n         Location : " cRST "%s(), %s:%u\n\n", \
+    SAYF(cLRD "\n         Location : " cRST "%s(), %s:%d\n\n", \
          __FUNCTION__, __FILE__, __LINE__); \
     exit(1); \
   } while (0)
@@ -231,7 +231,7 @@
 
 #define ABORT(...) do { \
     SAYF(bSTOP RESET_G1 CURSOR_SHOW cLRD "\n[-] PROGRAM ABORT : " cBRI __VA_ARGS__); \
-    SAYF(cLRD "\n    Stop location : " cRST "%s(), %s:%u\n\n", \
+    SAYF(cLRD "\n    Stop location : " cRST "%s(), %s:%d\n\n", \
          __FUNCTION__, __FILE__, __LINE__); \
     abort(); \
   } while (0)
@@ -241,7 +241,7 @@
 #define PFATAL(...) do { \
     fflush(stdout); \
     SAYF(bSTOP RESET_G1 CURSOR_SHOW cLRD "\n[-]  SYSTEM ERROR : " cBRI __VA_ARGS__); \
-    SAYF(cLRD "\n    Stop location : " cRST "%s(), %s:%u\n", \
+    SAYF(cLRD "\n    Stop location : " cRST "%s(), %s:%d\n", \
          __FUNCTION__, __FILE__, __LINE__); \
     SAYF(cLRD "       OS message : " cRST "%s\n", strerror(errno)); \
     exit(1); \
